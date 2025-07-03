@@ -16,24 +16,24 @@ export const CharacterSearch: React.FC<CharacterSearchProps> = ({ onSearch }) =>
   };
 
   return (
-    <div className="w-full max-w-3xl mx-auto mb-8">
+    <div className="w-full max-w-3xl mx-auto mt-4 mb-16 relative z-10">
       <div className={`relative group ${isFocused ? 'scale-105' : ''} transition-transform duration-300`}>
         {/* Efecto de energía base */}
         <div className="absolute -inset-1 bg-gradient-to-r from-orange-500 via-yellow-500 to-orange-500 rounded-lg blur-sm opacity-75 group-hover:opacity-100 transition duration-1000 group-hover:duration-200 animate-pulse"></div>
         
         {/* Shen Long Effect */}
-        <div className="absolute -inset-x-10 -inset-y-20 pointer-events-none z-10 overflow-hidden">
+        <div className="absolute -inset-x-10 -top-24 pointer-events-none overflow-visible">
           <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/20 via-transparent to-emerald-500/20 animate-pulse"></div>
           <div 
-            className="absolute top-20 left-1/2 transform -translate-x-1/2 w-80 h-20"
+            className="absolute top-16 left-1/2 transform -translate-x-1/2 w-[500px] h-40"
             style={{
-              backgroundImage: "url('/images/shenlong.webp')", // Asegúrate de tener esta imagen
+              backgroundImage: "url('/images/shenlong.webp')",
               backgroundSize: 'contain',
               backgroundPosition: 'center',
               backgroundRepeat: 'no-repeat',
-              filter: 'drop-shadow(0 0 10px rgba(0, 255, 0, 0.5))',
-              opacity: isFocused ? '0.8' : '0.4',
-              transform: `translate(-50%, ${isFocused ? '-10%' : '-5%'}) scale(${isFocused ? '1.1' : '1'})`,
+              filter: 'drop-shadow(0 0 15px rgba(0, 255, 0, 0.7))',
+              opacity: isFocused ? '1' : '0.6',
+              transform: `translate(-50%, ${isFocused ? '-30%' : '-20%'}) scale(${isFocused ? '1.2' : '1'})`,
               transition: 'all 0.3s ease-in-out'
             }}
           />

@@ -131,33 +131,30 @@ export const MaxPowerCard: React.FC<MaxPowerCardProps> = ({ card, onClose }) => 
         >
           {/* Imagen del personaje */}
           <div className="absolute inset-0 z-0">
-            <div className="relative w-full h-full overflow-hidden">
-              <img
-                src={card.image}
-                alt={card.name}
-                className="w-full h-full object-contain object-center transform hover:scale-110 transition-transform duration-700"
-                style={{
-                  position: 'absolute',
-                  top: '50%',
-                  left: '50%',
-                  transform: 'translate(-50%, -50%)',
-                  maxHeight: '100%',
-                  maxWidth: '100%'
-                }}
-              />
-            </div>
+            <img
+              src={card.image}
+              alt={card.name}
+              className="w-full h-full object-cover"
+              style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                width: '100%',
+                height: '100%'
+              }}
+            />
           </div>
 
           {/* Overlay con gradiente ajustado */}
           <div 
-            className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black opacity-80 z-0" 
+            className="absolute inset-0 z-10" 
             style={{
-              background: 'linear-gradient(to bottom, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.1) 30%, rgba(0,0,0,0.1) 70%, rgba(0,0,0,0.8) 100%)'
+              background: 'linear-gradient(to bottom, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.1) 30%, rgba(0,0,0,0.1) 70%, rgba(0,0,0,0.9) 100%)'
             }}
           />
 
           {/* Nombre y descripción (arriba) */}
-          <div className="relative p-4 text-white z-10">
+          <div className="relative p-4 text-white z-20">
             <h3 className="text-2xl font-bold mb-2 text-center text-yellow-400 drop-shadow-glow">
               {card.name}
             </h3>
@@ -167,15 +164,15 @@ export const MaxPowerCard: React.FC<MaxPowerCardProps> = ({ card, onClose }) => 
           <div className="flex-1" />
 
           {/* Estadísticas simplificadas (solo poder y ki) */}
-          <div className="relative p-4 text-white bg-gradient-to-t from-black/90 to-transparent z-30">
+          <div className="relative p-4 text-white z-20">
             <div className="grid grid-cols-2 gap-4">
-              <div className="text-center bg-red-600/50 backdrop-blur-sm px-2 py-2 rounded-lg transform hover:scale-105 transition-all duration-300">
+              <div className="text-center bg-gradient-to-br from-red-900/80 to-red-600/80 backdrop-blur-sm px-2 py-2 rounded-lg transform hover:scale-105 transition-all duration-300 border border-red-500/50 shadow-lg shadow-red-500/30">
                 <div className="text-sm text-red-200 font-semibold mb-1">Poder</div>
-                <div className="font-bold text-xl text-white">{card.power.toLocaleString()}</div>
+                <div className="font-bold text-xl text-white drop-shadow-[0_0_3px_rgba(255,0,0,0.5)]">{card.power.toLocaleString()}</div>
               </div>
-              <div className="text-center bg-yellow-600/50 backdrop-blur-sm px-2 py-2 rounded-lg transform hover:scale-105 transition-all duration-300">
+              <div className="text-center bg-gradient-to-br from-yellow-900/80 to-yellow-600/80 backdrop-blur-sm px-2 py-2 rounded-lg transform hover:scale-105 transition-all duration-300 border border-yellow-500/50 shadow-lg shadow-yellow-500/30">
                 <div className="text-sm text-yellow-200 font-semibold mb-1">Ki</div>
-                <div className="font-bold text-xl text-white">{card.ki.toLocaleString()}</div>
+                <div className="font-bold text-xl text-white drop-shadow-[0_0_3px_rgba(255,255,0,0.5)]">{card.ki.toLocaleString()}</div>
               </div>
             </div>
           </div>

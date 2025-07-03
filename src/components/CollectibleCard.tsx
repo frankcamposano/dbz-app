@@ -16,17 +16,40 @@ export const CollectibleCard: React.FC<CollectibleCardProps> = ({
   const [isHovered, setIsHovered] = useState(false);
 
   const rarityColors = {
-    'común': 'from-gray-400 to-gray-600',
-    'rara': 'from-blue-400 to-blue-600',
-    'épica': 'from-purple-400 to-purple-600',
-    'legendaria': 'from-yellow-400 to-orange-600'
+    'common': 'from-gray-400 to-gray-600',
+    'rare': 'from-blue-400 to-blue-600',
+    'epic': 'from-purple-400 to-purple-600',
+    'legendary': 'from-yellow-400 to-orange-600',
+    'maxpower': 'from-red-400 to-red-600'
   };
 
   const rarityBorders = {
-    'común': 'border-gray-400',
-    'rara': 'border-blue-400',
-    'épica': 'border-purple-400',
-    'legendaria': 'border-yellow-400'
+    'common': 'border-gray-400',
+    'rare': 'border-blue-400',
+    'epic': 'border-purple-400',
+    'legendary': 'border-yellow-400',
+    'maxpower': 'border-red-400'
+  };
+
+  const getRarityDisplayText = (rarity: string) => {
+    switch(rarity) {
+      case 'common': return 'COMÚN';
+      case 'rare': return 'RARA';
+      case 'epic': return 'ÉPICA';
+      case 'legendary': return 'LEGENDARIA';
+      case 'maxpower': return 'MAX POWER';
+      default: return rarity.toUpperCase();
+    }
+  };
+
+  const getRarityTextColor = (rarity: string) => {
+    switch(rarity) {
+      case 'legendary': return 'text-yellow-400';
+      case 'epic': return 'text-purple-400';
+      case 'rare': return 'text-blue-400';
+      case 'maxpower': return 'text-red-400';
+      default: return 'text-gray-400';
+    }
   };
 
   return (
@@ -43,55 +66,52 @@ export const CollectibleCard: React.FC<CollectibleCardProps> = ({
       >
         {/* Frente de la carta */}
         <div className="absolute inset-0 backface-hidden">
-          <div className={`w-full h-full rounded-2xl overflow-hidden border-4 ${rarityBorders[card.rarity]} shadow-xl`}>
-            {/* Fondo con efecto de brillo */}
-            <div className={`absolute inset-0 bg-gradient-to-br ${rarityColors[card.rarity]} opacity-75`}>
+          <div className={`relative w-full h-full rounded-2xl overflow-hidden`}>
+            {/* Imagen base */}
+            <img
+              src={card.image}
+              alt={card.name}
+              className="absolute inset-0 w-full h-full object-cover"
+            />
+
+            {/* Borde de color según rareza */}
+            <div className={`absolute inset-0 ring-4 ${rarityBorders[card.rarity]}`} />
+
+            {/* Overlay con efectos */}
+            <div className={`absolute inset-0 bg-gradient-to-br ${rarityColors[card.rarity]} opacity-40 mix-blend-overlay`}>
               {card.holographic && (
                 <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-shine" />
               )}
             </div>
 
-            {/* Imagen del personaje */}
-            <div className="relative h-2/3">
-              <img
-                src={card.image}
-                alt={card.name}
-                className="w-full h-full object-cover"
-              />
-              {/* Overlay con brillo */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
-            </div>
+            {/* Gradiente para legibilidad */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent" />
 
             {/* Información de la carta */}
-            <div className="relative p-4 bg-gradient-to-b from-black/80 to-black">
-              <h3 className="text-white font-bold text-xl mb-2">{card.name}</h3>
+            <div className="absolute bottom-0 left-0 right-0 p-3 z-10">
+              <h3 className="text-white font-bold text-xl mb-2 drop-shadow-lg">{card.name}</h3>
               
               {/* Estadísticas */}
               <div className="grid grid-cols-3 gap-2 text-sm">
                 <div className="flex items-center space-x-1">
-                  <Zap className="w-4 h-4 text-yellow-400" />
-                  <span className="text-yellow-300">{card.power}</span>
+                  <Zap className="w-4 h-4 text-yellow-400 drop-shadow-lg" />
+                  <span className="text-yellow-300 drop-shadow-lg">{card.power}</span>
                 </div>
                 <div className="flex items-center space-x-1">
-                  <Shield className="w-4 h-4 text-blue-400" />
-                  <span className="text-blue-300">{card.defense}</span>
+                  <Shield className="w-4 h-4 text-blue-400 drop-shadow-lg" />
+                  <span className="text-blue-300 drop-shadow-lg">{card.defense}</span>
                 </div>
                 <div className="flex items-center space-x-1">
-                  <Flame className="w-4 h-4 text-red-400" />
-                  <span className="text-red-300">{card.ki}</span>
+                  <Flame className="w-4 h-4 text-red-400 drop-shadow-lg" />
+                  <span className="text-red-300 drop-shadow-lg">{card.ki}</span>
                 </div>
               </div>
             </div>
 
             {/* Rareza */}
-            <div className="absolute top-2 right-2 px-2 py-1 rounded-full bg-black/50 backdrop-blur-sm">
-              <span className={`text-xs font-bold ${
-                card.rarity === 'legendaria' ? 'text-yellow-400' :
-                card.rarity === 'épica' ? 'text-purple-400' :
-                card.rarity === 'rara' ? 'text-blue-400' :
-                'text-gray-400'
-              }`}>
-                {card.rarity.toUpperCase()}
+            <div className="absolute top-2 right-2 px-2 py-1 rounded-full bg-black/50 backdrop-blur-sm z-10">
+              <span className={`text-xs font-bold ${getRarityTextColor(card.rarity)}`}>
+                {getRarityDisplayText(card.rarity)}
               </span>
             </div>
           </div>
