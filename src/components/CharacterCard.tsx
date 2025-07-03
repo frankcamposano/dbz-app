@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { Character } from '../types/Character';
 import { Zap, Shield, Swords, Volume2, VolumeX, User, MapPin } from 'lucide-react';
 import { useAudio } from '../hooks/useAudio';
@@ -8,10 +8,42 @@ interface CharacterCardProps {
   onClick: () => void;
 }
 
-export const CharacterCard: React.FC<CharacterCardProps> = ({ character, onClick }) => {
+export const CharacterCard: React.FC<CharacterCardProps> = React.memo(({ character, onClick }) => {
   const { playPhrase, stopAudio, isPlaying: isSynthPlaying } = useAudio();
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [isAudioPlaying, setIsAudioPlaying] = useState(false);
+  const [isImageLoaded, setIsImageLoaded] = useState(false);
+  const imageRef = useRef<HTMLImageElement>(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting && imageRef.current) {
+            imageRef.current.src = character.image;
+          }
+        });
+      },
+      {
+        rootMargin: '50px',
+        threshold: 0.1
+      }
+    );
+
+    if (imageRef.current) {
+      observer.observe(imageRef.current);
+    }
+
+    return () => {
+      if (imageRef.current) {
+        observer.unobserve(imageRef.current);
+      }
+    };
+  }, [character.image]);
+
+  const handleImageLoad = () => {
+    setIsImageLoaded(true);
+  };
 
   const handleCardClick = () => {
     onClick();
@@ -54,15 +86,21 @@ export const CharacterCard: React.FC<CharacterCardProps> = ({ character, onClick
     >
       {/* Imagen Principal del Personaje */}
       <div className="relative h-80 overflow-hidden">
+        <div className={`absolute inset-0 bg-gray-800 transition-opacity duration-300 ${isImageLoaded ? 'opacity-0' : 'opacity-100'}`} />
         <img 
-          src={character.image}
+          ref={imageRef}
           alt={character.name}
-          className="w-full h-full object-cover object-center transition-transform duration-700 group-hover:scale-110"
+          className={`w-full h-full object-cover object-center transition-all duration-700 group-hover:scale-110 ${
+            isImageLoaded ? 'opacity-100' : 'opacity-0'
+          }`}
           style={{ 
             filter: 'brightness(0.9) contrast(1.1)',
             objectPosition: 'center top'
           }}
           loading="lazy"
+          decoding="async"
+          onLoad={handleImageLoad}
+          data-src={character.image}
         />
         <div className="absolute inset-0 bg-gradient-to-t from-gray-900 via-gray-900/30 to-transparent" />
         
@@ -194,4 +232,6 @@ export const CharacterCard: React.FC<CharacterCardProps> = ({ character, onClick
       </div>
     </div>
   );
-};
+});
+
+CharacterCard.displayName = 'CharacterCard';

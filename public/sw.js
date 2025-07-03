@@ -1,56 +1,73 @@
-const CACHE_NAME = 'dbz-warriors-v1';
-const urlsToCache = [
+const CACHE_NAME = 'dbz-app-v1';
+const STATIC_RESOURCES = [
   '/',
   '/index.html',
-  '/src/main.tsx',
-  '/src/App.tsx',
-  '/src/index.css',
-  '/audios/gohan.mp3',
-  '/audios/goku.mp3',
-  '/audios/ki.mp3',
-  '/audios/krillin.mp3',
-  '/audios/napa.mp3',
-  '/audios/picollo.mp3',
-  '/audios/ten.mp3',
-  '/audios/vegeta.mp3'
+  '/manifest.json',
 ];
+
+const IMAGE_CACHE_NAME = 'dbz-app-images-v1';
+const AUDIO_CACHE_NAME = 'dbz-app-audio-v1';
 
 // Instalar Service Worker
 self.addEventListener('install', (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then((cache) => {
-        console.log('Cache abierto');
-        return cache.addAll(urlsToCache.map(url => new Request(url, {credentials: 'same-origin'})))
-          .catch(error => {
-            console.error('Error al cachear recursos:', error);
-          });
-      })
+    Promise.all([
+      caches.open(CACHE_NAME).then((cache) => cache.addAll(STATIC_RESOURCES)),
+      caches.open(IMAGE_CACHE_NAME),
+      caches.open(AUDIO_CACHE_NAME)
+    ])
   );
 });
 
 // Interceptar requests
 self.addEventListener('fetch', (event) => {
-  event.respondWith(
-    caches.match(event.request)
-      .then((response) => {
-        // Devolver desde cache si existe
-        if (response) {
-          return response;
-        }
-        // Si no está en cache, intentar fetch
-        return fetch(event.request)
-          .catch(error => {
-            console.error('Error al hacer fetch:', error);
-            // Si el fetch falla, podríamos devolver una respuesta fallback aquí
-            return new Response('Error al cargar el recurso', {
-              status: 404,
-              headers: new Headers({
-                'Content-Type': 'text/plain'
-              })
-            });
+  const url = new URL(event.request.url);
+  
+  // Manejar imágenes
+  if (event.request.destination === 'image') {
+    event.respondWith(
+      caches.open(IMAGE_CACHE_NAME).then((cache) => {
+        return cache.match(event.request).then((response) => {
+          const fetchPromise = fetch(event.request).then((networkResponse) => {
+            cache.put(event.request, networkResponse.clone());
+            return networkResponse;
           });
+          return response || fetchPromise;
+        });
       })
+    );
+    return;
+  }
+
+  // Manejar archivos de audio
+  if (event.request.url.includes('/audios/')) {
+    event.respondWith(
+      caches.open(AUDIO_CACHE_NAME).then((cache) => {
+        return cache.match(event.request).then((response) => {
+          const fetchPromise = fetch(event.request).then((networkResponse) => {
+            cache.put(event.request, networkResponse.clone());
+            return networkResponse;
+          });
+          return response || fetchPromise;
+        });
+      })
+    );
+    return;
+  }
+
+  // Manejar otros recursos
+  event.respondWith(
+    caches.open(CACHE_NAME).then((cache) => {
+      return cache.match(event.request).then((response) => {
+        const fetchPromise = fetch(event.request).then((networkResponse) => {
+          if (STATIC_RESOURCES.includes(url.pathname)) {
+            cache.put(event.request, networkResponse.clone());
+          }
+          return networkResponse;
+        });
+        return response || fetchPromise;
+      });
+    })
   );
 });
 
@@ -60,7 +77,7 @@ self.addEventListener('activate', (event) => {
     caches.keys().then((cacheNames) => {
       return Promise.all(
         cacheNames.map((cacheName) => {
-          if (cacheName !== CACHE_NAME) {
+          if (![CACHE_NAME, IMAGE_CACHE_NAME, AUDIO_CACHE_NAME].includes(cacheName)) {
             return caches.delete(cacheName);
           }
         })
